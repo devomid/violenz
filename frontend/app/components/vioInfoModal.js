@@ -13,9 +13,10 @@ import { Formik } from 'formik'
 import { VioValidation } from '../../validation/yupValidation';
 import { useViolation } from '../../hooks/useViolation';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FormField from './FormField';
 
 
-const VioInfoModal = ({ open, setOpen, violationImage }) => {
+const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading }) => {
     // const { violationImage, setViolationImage } = GeneralState();
     const [selected, setSelected] = useState("");
     const [vioValue, setVioValue] = useState(null);

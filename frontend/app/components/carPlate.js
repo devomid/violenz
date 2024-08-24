@@ -4,6 +4,7 @@ const flag = require('../../assets/images/images.png')
 import { Dropdown } from 'react-native-element-dropdown';
 import { Formik } from 'formik';
 import { CarPlateValidation } from '../../validation/yupValidation';
+import FormField from './FormField';
 
 
 const CarPlate = ({ setCarPlateNumber }) => {

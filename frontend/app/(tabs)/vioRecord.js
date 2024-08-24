@@ -13,7 +13,8 @@ const VioRecord = () => {
   const [violationImage, setViolationImage] = useState();
   const [permission, requestPermission] = useCameraPermissions();
   const [vioModalOpen, setVioModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
 
   const cameraRef = useRef(null);
 
@@ -33,7 +34,7 @@ const VioRecord = () => {
   };
 
   const pickImage = async () => {
-    setIsLoading(true);
+    setIsUploading(true);
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -49,28 +50,28 @@ const VioRecord = () => {
     } catch (error) {
       console.log('Error retrieving picture from phone storage: ', error);
     } finally {
-      setIsLoading(false);
+      setIsUploading(false);
     }
   };
 
   const captureAndSend = async () => {
-    setIsLoading(true);
+    setIsCapturing(true);
     try {
+      setVioModalOpen(true)
       const photo = await cameraRef.current.takePictureAsync({ quality: 1, base64: true });
       setViolationImage(photo.uri);
       await MediaLibrary.saveToLibraryAsync(photo.uri);
-      setVioModalOpen(true)
 
     } catch (error) {
       console.log('Error capturing picture ', error);
     } finally {
-      setIsLoading(false);
+      setIsCapturing(false);
     };
   };
 
   return (
     <SafeAreaView >
-      <VioInfoModal open={vioModalOpen} setOpen={setVioModalOpen} violationImage={violationImage} />
+      <VioInfoModal open={vioModalOpen} setOpen={setVioModalOpen} violationImage={violationImage} isCapturing={isCapturing} isUploading={isUploading} />
       <CameraView style={{ height: '100%' }} ref={cameraRef} animateShutter autofocus='on' facing={'back'}>
 
         <View className='flex-1 w-full items-center justify-end pb-3'>
