@@ -1,0 +1,6 @@
+signupOperator
+signinOperator
+operatorReadViolations
+operatorApprove
+operatorDeny
+denyCause
