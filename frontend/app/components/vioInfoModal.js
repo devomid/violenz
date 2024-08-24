@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Alert, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { SelectList } from 'react-native-dropdown-select-list';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -99,7 +99,11 @@ const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading 
                                         </View>
 
                                         <View style={styles.vioImageContainer}>
-                                            <Image style={styles.vioImage} source={{ uri: violationImage }} />
+                                            {isUploading || isCapturing ? (
+                                                <ActivityIndicator style={{ minWidth: '95%', height: 215 }} size="small" color="#0d6ff0" />
+                                            ) : (
+                                                <Image style={styles.vioImage} source={{ uri: violationImage }} />
+                                            )}
                                         </View>
 
                                         <View style={styles.dropdownContainer}>

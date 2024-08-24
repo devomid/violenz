@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import { StatusBar } from 'expo-status-bar';
 import React, { useRef, useState } from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import icons from '../../constants/icons';
 import CustomButton from '../components/CustomButton';
@@ -15,6 +15,7 @@ const VioRecord = () => {
   const [vioModalOpen, setVioModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [location, setLocation] = useState();
 
   const cameraRef = useRef(null);
 
@@ -42,9 +43,9 @@ const VioRecord = () => {
         quality: 1,
       });
       if (!result.canceled) {
+        setVioModalOpen(true);
         const photoUri = result.assets[0].uri;
         setViolationImage(photoUri);
-        setVioModalOpen(true);
       };
 
     } catch (error) {
@@ -71,7 +72,7 @@ const VioRecord = () => {
 
   return (
     <SafeAreaView >
-      <VioInfoModal open={vioModalOpen} setOpen={setVioModalOpen} violationImage={violationImage} isCapturing={isCapturing} isUploading={isUploading} />
+      <VioInfoModal open={vioModalOpen} setOpen={setVioModalOpen} violationImage={violationImage} isCapturing={isCapturing} isUploading={isUploading} location={location} />
       <CameraView style={{ height: '100%' }} ref={cameraRef} animateShutter autofocus='on' facing={'back'}>
 
         <View className='flex-1 w-full items-center justify-end pb-3'>
@@ -86,11 +87,19 @@ const VioRecord = () => {
               alignItems: 'center'
             }}
             onPress={pickImage}>
-            <Image className='w-8 h-8' resizeMethod='contain' source={icons.upload} tintColor='white' />
+            {isUploading || isCapturing ? (
+              <ActivityIndicator size="large" color="#0d6ff0" />
+            ) : (
+              <Image className='w-8 h-8' resizeMethod='contain' source={icons.upload} tintColor='white' />
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity style={{ borderWidth: 2, borderColor: 'white', borderRadius: 15, width: '95%', height: '15%', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(255, 255, 255, 0.3)' }} onPress={captureAndSend}>
-            <Image className='w-11 h-11' resizeMethod='contain' source={icons.camera} tintColor='white' />
+            {isUploading || isCapturing ? (
+              <ActivityIndicator size="large" color="#0d6ff0" />
+            ) : (
+              <Image className='w-11 h-11' resizeMethod='contain' source={icons.camera} tintColor='white' />
+            )}
           </TouchableOpacity>
         </View>
       </CameraView>
