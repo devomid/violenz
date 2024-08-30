@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderWidth: 1.65,
         borderRadius: 16,
+        justifyContent: 'center',
     },
     littleConrainer: {
         width: '11.5%',

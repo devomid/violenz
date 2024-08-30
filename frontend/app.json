@@ -31,7 +31,13 @@
       "expo-font",
       "expo-build-properties",
       "expo-build-properties",
-      "expo-local-authentication"
+      "expo-local-authentication",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow frontend to use your location."
+        }
+      ]
     ]
   }
 }

@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View, Modal, Alert, ScrollView, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SelectList } from 'react-native-dropdown-select-list';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -14,6 +14,9 @@ import { VioValidation } from '../../validation/yupValidation';
 import { useViolation } from '../../hooks/useViolation';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FormField from './FormField';
+import Map from './map';
+import * as Location from 'expo-location';
+
 
 
 const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading }) => {
@@ -24,6 +27,24 @@ const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [carPlateNumber, setCarPlateNumber] = useState('');
     const { sendVio } = useViolation()
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location.coords)
+
+            console.log(location.coords);
+        })();
+    }, []);
 
     const data = [
         { label: 'سبقت غیرمجاز در راه‌های دوطرفه', value: '2003' },
@@ -92,18 +113,14 @@ const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading 
                             <>
                                 <ScrollView style={{ marginBottom: 70 }}>
                                     <View style={styles.infoContainer}>
-                                        <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 25 }}>
+                                        {/* <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 25 }}>
                                             <Text style={{ fontFamily: 'vazirBold', fontSize: 20 }}>
                                                 تخلف شماره {2 + 2}
                                             </Text>
-                                        </View>
+                                        </View> */}
 
-                                        <View style={styles.vioImageContainer}>
-                                            {isUploading || isCapturing ? (
-                                                <ActivityIndicator style={{ minWidth: '95%', height: 215 }} size="small" color="#0d6ff0" />
-                                            ) : (
-                                                <Image style={styles.vioImage} source={{ uri: violationImage }} />
-                                            )}
+                                        <View style={{ width: '100%' }}>
+                                            <CarPlate setCarPlateNumber={setCarPlateNumber} />
                                         </View>
 
                                         <View style={styles.dropdownContainer}>
@@ -140,16 +157,22 @@ const VioInfoModal = ({ open, setOpen, violationImage, isCapturing, isUploading 
                                             />
                                         </View>
 
+                                        <View style={styles.vioImageContainer}>
+                                            {isUploading || isCapturing ? (
+                                                <ActivityIndicator style={{ minWidth: '95%', height: 215 }} size="small" color="#0d6ff0" />
+                                            ) : (
+                                                <Image style={styles.vioImage} source={{ uri: violationImage }} />
+                                            )}
+                                        </View>
+
                                         <View style={styles.vioPlaceContainer}>
-                                            <FormField title='محل وقوع تخلف' value={values.violationGeoLocation} handleChangeText={handleChange('violationGeoLocation')} otherStyles='mt-7' keyboardType='default' />
-                                            {/* <TextInput style={styles.vioPlaceInput} placeholder='' /> */}
+                                            {!location ? (
+                                                <ActivityIndicator style={{ minWidth: '95%', height: 215 }} size="small" color="#0d6ff0" />
+                                            ) : (
+                                                <Map location={location} />
+                                            )}
                                         </View>
 
-                                        <View style={{ width: '97%' }}>
-                                            <CarPlate setCarPlateNumber={setCarPlateNumber} />
-                                        </View>
-
-                                        <TicketInfo />
                                     </View>
 
                                 </ScrollView>
@@ -189,25 +212,34 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         width: '100%',
-        padding: 10,
-        justifyContent: 'flex-start',
+        padding: 5,
+        justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column'
     },
     infoContainer: {
+        justifyContent: 'center',
         flex: 6,
-        width: '100%'
+        width: '100%',
+        padding: 7,
     },
     vioImageContainer: {
         alignItems: 'center',
-        marginBottom: 18,
+        marginBottom: 15,
+        borderWidth: 1,
+        borderColor: '#0d6ff0',
+        borderRadius: 10,
+        marginTop: 15
     },
     vioImage: {
-        width: '95%',
-        height: 200,
         borderRadius: 10,
+        height: 210,
+        width: '100%',
         resizeMode: 'cover',
-        marginTop: 15
+    },
+    dropdownContainer: {
+        width: '100%',
+        marginTop: 18
     },
     dropdown: {
         height: 50,
@@ -218,11 +250,10 @@ const styles = StyleSheet.create({
         textAlign: 'right'
     },
     vioPlaceContainer: {
-        height: 45,
-        marginVertical: 19,
-        borderWidth: 0.7,
-        borderColor: 'grey',
-        borderRadius: 10
+        height: 220,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#0d6ff0'
     },
     vioPlaceInput: {
         padding: 8,
